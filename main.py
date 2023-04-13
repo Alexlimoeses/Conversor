@@ -47,7 +47,7 @@ class conversor_moeda:
         
 
         # Criando o botão de plotar gráfico
-        self.plotar_grafico_button = Button(self.master, text="Plotar Gráfico", command=self.graff)
+        self.plotar_grafico_button = Button(self.master, text="Plotar Gráfico", command=self.graff_dia)
 
         # Posicionando os widgets
         self.moeda_label.grid(row=0, column=0)
@@ -64,341 +64,104 @@ class conversor_moeda:
 
         self.plotar_grafico_button.grid(row=5, column=1)
         
-    def graff(self):
+    def graff_dia(self):
 
         if self.dat_var.get() == "Um dia":
             
             self.end_date = datetime.now().strftime('%Y-%m-%d')
             self.start_date = (datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d')
-                    
-            if self.moeda_var.get() == "USDBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='USD', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-            
-            elif self.moeda_var.get() == "EURBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='EUR', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-                
-            elif self.moeda_var.get() == "BTCBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='BTC', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-            
-            elif self.moeda_var.get() == "JPYBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='JPY', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show()
-
+            self.graff_moeda()
+                   
         elif self.dat_var.get() == "Uma semana":
             self.end_date = datetime.now().strftime('%Y-%m-%d')
             self.start_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-            
-            if self.moeda_var.get() == "USDBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='USD', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-            
-            elif self.moeda_var.get() == "EURBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='EUR', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-                
-            elif self.moeda_var.get() == "BTCBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='BTC', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
- 
-            elif self.moeda_var.get() == "JPYBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='JPY', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                            # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show()
+            self.graff_moeda()            
         
         elif self.dat_var.get() == "Um mês":
             self.end_date = datetime.now().strftime('%Y-%m-%d')
             self.start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
-            
-            if self.moeda_var.get() == "USDBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='USD', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
+            self.graff_moeda()
 
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-            
-            elif self.moeda_var.get() == "EURBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='EUR', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-
-            elif self.moeda_var.get() == "BTCBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='BTC', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-         
-            elif self.moeda_var.get() == "JPYBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='JPY', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
-
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show()
-            
         elif self.dat_var.get() == "Um ano":
             self.end_date = datetime.now().strftime('%Y-%m-%d')
             self.start_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
+            self.graff_moeda()
 
-            if self.moeda_var.get() == "USDBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='USD', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
+    def graff_moeda(self):
+            
+        if self.moeda_var.get() == "USDBRL":
+            self.api_key = 'SUA_CHAVE_API'
+            self.fx = ForeignExchange(key=self.api_key)
+            self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='USD', to_symbol='BRL', outputsize='full')
+            self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
+            self.data = self.data.loc[self.start_date:self.end_date]
+            
+            # Calcule a taxa de variação diária da moeda
+            self.daily_returns = self.data['4. close'].astype(float).pct_change()
 
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-            
-            elif self.moeda_var.get() == "EURBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='EUR', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
+            # Plote o gráfico da taxa de variação diária
+            plt.plot(self.daily_returns.index, self.daily_returns)
+            plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
+            plt.xlabel('Data')
+            plt.ylabel('Taxa de variação diária')
+        
+            # Remove o eixo x
+            plt.gca().axes.xaxis.set_visible(False)
+        
+            plt.show() 
+        
+        elif self.moeda_var.get() == "EURBRL":
+            self.api_key = 'SUA_CHAVE_API'
+            self.fx = ForeignExchange(key=self.api_key)
+            self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='EUR', to_symbol='BRL', outputsize='full')
+            self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
+            self.data = self.data.loc[self.start_date:self.end_date]
+            # Calcule a taxa de variação diária da moeda
+            self.daily_returns = self.data['4. close'].astype(float).pct_change()
 
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
+            # Plote o gráfico da taxa de variação diária
+            plt.plot(self.daily_returns.index, self.daily_returns)
+            plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
+            plt.xlabel('Data')
+            plt.ylabel('Taxa de variação diária')
+        
+            # Remove o eixo x
+            plt.gca().axes.xaxis.set_visible(False)
+        
+            plt.show() 
             
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-                
-            elif self.moeda_var.get() == "BTCBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='BTC', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
+        elif self.moeda_var.get() == "BTCBRL":
+            self.api_key = 'SUA_CHAVE_API'
+            self.fx = ForeignExchange(key=self.api_key)
+            self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='BTC', to_symbol='BRL', outputsize='full')
+            self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
+            self.data = self.data.loc[self.start_date:self.end_date]
+            # Calcule a taxa de variação diária da moeda
+            self.daily_returns = self.data['4. close'].astype(float).pct_change()
 
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
-            
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show() 
-
-            elif self.moeda_var.get() == "JPYBRL":
+            # Plote o gráfico da taxa de variação diária
+            plt.plot(self.daily_returns.index, self.daily_returns)
+            plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
+            plt.xlabel('Data')
+            plt.ylabel('Taxa de variação diária')
+        
+            # Remove o eixo x
+            plt.gca().axes.xaxis.set_visible(False)
+        
+            plt.show() 
+        
+        elif self.moeda_var.get() == "JPYBRL":
                 self.api_key = 'SUA_CHAVE_API'
                 self.fx = ForeignExchange(key=self.api_key)
                 self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='JPY', to_symbol='BRL', outputsize='full')
                 self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
                 self.data = self.data.loc[self.start_date:self.end_date]
-                            # Calcule a taxa de variação diária da moeda
+                # Calcule a taxa de variação diária da moeda
                 self.daily_returns = self.data['4. close'].astype(float).pct_change()
 
                 # Plote o gráfico da taxa de variação diária
                 plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get().get()}')
+                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
                 plt.xlabel('Data')
                 plt.ylabel('Taxa de variação diária')
             
@@ -406,7 +169,8 @@ class conversor_moeda:
                 plt.gca().axes.xaxis.set_visible(False)
             
                 plt.show()
-        
+
+
 master = Tk()
 janela = conversor_moeda()
 janela.ttk(master)
