@@ -1,27 +1,18 @@
-import requests
+from bcb import currency
 import matplotlib.pyplot as plt
-from alpha_vantage.foreignexchange import ForeignExchange
+from tkcalendar import DateEntry
 from datetime import datetime, timedelta
-import pandas as pd
 from tkinter import *
+from tkinter import ttk
+import requests
 
 
 class conversor_moeda:
-    def _init_(self):
-        self.conversao = requests.get("http://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL,JPY-BRL,USD-BRLT")
-        #Pega as moedas disponíveis no site (Atualizado a cada 30 segundos) e armazena
-        
-        self.requisicao = self.conversao.json()
-        
-        self.cotacao_dolar = self.requisicao["USDBRL"]["bid"]
-        self.cotacao_euro = self.requisicao["EURBRL"]["bid"]
-        self.cotacao_bitc = self.requisicao["BTCBRL"]["bid"]
-        self.cotacao_yene = self.requisicao["JPYBRL"]["bid"]
-        self.cotacao_dolartur = self.requisicao["USDBRLT"]["bid"]
-               
-    def ttk(self,master):
+    def __init__(self,master):
         #Criando a janela
         self.master = master
+        
+        # Definindo dimensoes da janela
         master.geometry('500x400')
         self.master.title('Conversor de Moedas')
 
@@ -29,149 +20,147 @@ class conversor_moeda:
         self.moeda_label = Label(self.master, text="Selecione a moeda:")
         self.dat = Label(self.master, text="Escolha a data para a plotagem do gráfico:")
 
-        # Criando as opções de moeda
-        self.moeda_var = StringVar()
-        self.moeda_var.set("USDBRL")
-        self.moeda_usd = Radiobutton(self.master, text="Dólar americano (USD)", variable=self.moeda_var, value="USDBRL")
-        self.moeda_eur = Radiobutton(self.master, text="Euro (EUR)", variable=self.moeda_var, value="EURBRL")
-        self.moeda_btc = Radiobutton(self.master, text="Bitcoin (BTC)", variable=self.moeda_var, value="BTCBRL")
-        self.moeda_jpy = Radiobutton(self.master, text="Iene japonês (JPY)", variable=self.moeda_var, value="JPYBRL")
-
-        # Criando as entradas de data
-        self.dat_var = StringVar()
-        self.dat_var.set("Um dia")
-        self.dat_dia = Radiobutton(self.master, text="Um dia", variable=self.dat_var, value="Um dia")
-        self.dat_sem = Radiobutton(self.master, text="Uma semana", variable=self.dat_var, value="Uma semana")
-        self.dat_mes = Radiobutton(self.master, text="Um mês", variable=self.dat_var, value="Um mês")
-        self.dat_ano = Radiobutton(self.master, text="Um ano", variable=self.dat_var, value="Um ano")
+        # Definir as opções para o ComboBox
+        self.moedas = ['Dólar (USD)', 'Euro (EUR)', 'Libra (GBP)', 'Dolar canadense (CAD)']
         
+        self.moedas_con = ['Dólar (USD)', 'Euro (EUR)', 'Libra (GBP)', 'Dolar canadense (CAD), Real(BRL)']
+        self.moedas_con2 = ['Dólar (USD)', 'Euro (EUR)', 'Libra (GBP)', 'Dolar canadense (CAD), Real(BRL)']
+
+        # Criar o ComboBox
+        self.combo_moedas = ttk.Combobox(self.master, values=self.moedas)
+        self.destin = ttk.Combobox(self.master, values=self.moedas_con, width=31)
+        self.fin = ttk.Combobox(self.master, values=self.moedas_con2, width=31)
+
+        # Definir o valor padrão
+        self.combo_moedas.set('Selecione uma moeda')
+        self.destin.set('Selecione a moeda a ser convertida')
+        self.fin.set('Selecione a sua moeda final')
 
         # Criando o botão de plotar gráfico
-        self.plotar_grafico_button = Button(self.master, text="Plotar Gráfico", command=self.graff_dia)
+        self.plotar_grafico_button = Button(self.master, text="Plotar Gráfico", command=self.gerar_grafico)
+        self.converss = Button(self.master, text='Converter', command=self.convo)
+        
+        #Criar entrada para data
+        self.cal = DateEntry(master, width=12, background='darkblue', foreground='white', borderwidth=2)
 
         # Posicionando os widgets
-        self.moeda_label.grid(row=0, column=0)
-        self.moeda_usd.grid(row=1, column=0)
-        self.moeda_eur.grid(row=2, column=0)
-        self.moeda_btc.grid(row=3, column=0)
-        self.moeda_jpy.grid(row=4, column=0)
+        self.combo_moedas.place(x=356,y=0)
+        self.destin.place(x=1,y=200)
+        self.fin.place(x=290,y=200)
+        self.cal.place(x=1, y=0)
+        self.plotar_grafico_button.place(x=200,y=22)
+        self.converss.place(x=218,y=230)
 
-        self.dat.grid(row=0, column=1)
-        self.dat_dia.grid(row=1, column=1)
-        self.dat_sem.grid(row=2, column=1)
-        self.dat_mes.grid(row=3, column=1)
-        self.dat_ano.grid(row=4, column=1)
 
-        self.plotar_grafico_button.grid(row=5, column=1)
-        
-    def graff_dia(self):
+ 
+    def gerar_grafico(self):
 
-        if self.dat_var.get() == "Um dia":
+        data_selecionada = self.cal.get_date()
+        monedas = self.combo_moedas.get()
+
+        if monedas == "Dólar (USD)":
             
-            self.end_date = datetime.now().strftime('%Y-%m-%d')
-            self.start_date = (datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d')
-            self.graff_moeda()
-                   
-        elif self.dat_var.get() == "Uma semana":
-            self.end_date = datetime.now().strftime('%Y-%m-%d')
-            self.start_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-            self.graff_moeda()            
+            # Define as moedas e o período de tempo
+            moedas = ['USD']
+            data_inicio = data_selecionada.strftime('%Y-%m-%d')
+            data_fim = datetime.now().strftime('%Y-%m-%d')
+
+            # Recupera as taxas de câmbio usando o módulo bcb.currency
+            taxas = currency.get(moedas, start=data_inicio, end=data_fim)
+
+            # Plota as taxas de câmbio em um gráfico usando o matplotlib
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.plot(taxas.index, taxas['USD'], label='USD')
+            ax.legend()
+            ax.set_xlabel('Data')
+            ax.set_ylabel('Taxa de câmbio')
+            ax.set_title('Taxas de câmbio USD')
+            plt.show()
         
-        elif self.dat_var.get() == "Um mês":
-            self.end_date = datetime.now().strftime('%Y-%m-%d')
-            self.start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
-            self.graff_moeda()
-
-        elif self.dat_var.get() == "Um ano":
-            self.end_date = datetime.now().strftime('%Y-%m-%d')
-            self.start_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
-            self.graff_moeda()
-
-    def graff_moeda(self):
+        elif monedas == "Euro (EUR)":
             
-        if self.moeda_var.get() == "USDBRL":
-            self.api_key = 'SUA_CHAVE_API'
-            self.fx = ForeignExchange(key=self.api_key)
-            self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='USD', to_symbol='BRL', outputsize='full')
-            self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-            self.data = self.data.loc[self.start_date:self.end_date]
+            # Define as moedas e o período de tempo
+            moedas = ['EUR']
+            data_inicio = data_selecionada.strftime('%Y-%m-%d')
+            data_fim = datetime.now().strftime('%Y-%m-%d')
+
+            # Recupera as taxas de câmbio usando o módulo bcb.currency
+            taxas = currency.get(moedas, start=data_inicio, end=data_fim)
+
+            # Plota as taxas de câmbio em um gráfico usando o matplotlib
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.plot(taxas.index, taxas['EUR'], label='EUR')
+            ax.plot(taxas.index, taxas['EUR'], label='EUR')
+            ax.legend()
+            ax.set_xlabel('Data')
+            ax.set_ylabel('Taxa de câmbio')
+            ax.set_title('Taxas de câmbio EUR')
+            plt.show()
+        
+        elif monedas == "Libra (GBP)":
             
-            # Calcule a taxa de variação diária da moeda
-            self.daily_returns = self.data['4. close'].astype(float).pct_change()
+            # Define as moedas e o período de tempo
+            moedas = ['GBP']
+            data_inicio = data_selecionada.strftime('%Y-%m-%d')
+            data_fim = datetime.now().strftime('%Y-%m-%d')
 
-            # Plote o gráfico da taxa de variação diária
-            plt.plot(self.daily_returns.index, self.daily_returns)
-            plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-            plt.xlabel('Data')
-            plt.ylabel('Taxa de variação diária')
-        
-            # Remove o eixo x
-            plt.gca().axes.xaxis.set_visible(False)
-        
-            plt.show() 
-        
-        elif self.moeda_var.get() == "EURBRL":
-            self.api_key = 'SUA_CHAVE_API'
-            self.fx = ForeignExchange(key=self.api_key)
-            self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='EUR', to_symbol='BRL', outputsize='full')
-            self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-            self.data = self.data.loc[self.start_date:self.end_date]
-            # Calcule a taxa de variação diária da moeda
-            self.daily_returns = self.data['4. close'].astype(float).pct_change()
+            # Recupera as taxas de câmbio usando o módulo bcb.currency
+            taxas = currency.get(moedas, start=data_inicio, end=data_fim)
 
-            # Plote o gráfico da taxa de variação diária
-            plt.plot(self.daily_returns.index, self.daily_returns)
-            plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-            plt.xlabel('Data')
-            plt.ylabel('Taxa de variação diária')
-        
-            # Remove o eixo x
-            plt.gca().axes.xaxis.set_visible(False)
-        
-            plt.show() 
+            # Plota as taxas de câmbio em um gráfico usando o matplotlib
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.plot(taxas.index, taxas['GBP'], label='GBP')
+            ax.legend()
+            ax.set_xlabel('Data')
+            ax.set_ylabel('Taxa de câmbio')
+            ax.set_title('Taxas de câmbio GBP')
+            plt.show()
+
+        elif monedas == "Dolar canadense (CAD)":
             
-        elif self.moeda_var.get() == "BTCBRL":
-            self.api_key = 'SUA_CHAVE_API'
-            self.fx = ForeignExchange(key=self.api_key)
-            self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='BTC', to_symbol='BRL', outputsize='full')
-            self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-            self.data = self.data.loc[self.start_date:self.end_date]
-            # Calcule a taxa de variação diária da moeda
-            self.daily_returns = self.data['4. close'].astype(float).pct_change()
+            # Define as moedas e o período de tempo
+            moedas = ['CAD']
+            data_inicio = data_selecionada.strftime('%Y-%m-%d')
+            data_fim = datetime.now().strftime('%Y-%m-%d')
 
-            # Plote o gráfico da taxa de variação diária
-            plt.plot(self.daily_returns.index, self.daily_returns)
-            plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-            plt.xlabel('Data')
-            plt.ylabel('Taxa de variação diária')
-        
-            # Remove o eixo x
-            plt.gca().axes.xaxis.set_visible(False)
-        
-            plt.show() 
-        
-        elif self.moeda_var.get() == "JPYBRL":
-                self.api_key = 'SUA_CHAVE_API'
-                self.fx = ForeignExchange(key=self.api_key)
-                self.data, _ = self.fx.get_currency_exchange_daily(from_symbol='JPY', to_symbol='BRL', outputsize='full')
-                self.data = pd.DataFrame.from_dict(self.data, orient='index').sort_index()
-                self.data = self.data.loc[self.start_date:self.end_date]
-                # Calcule a taxa de variação diária da moeda
-                self.daily_returns = self.data['4. close'].astype(float).pct_change()
+            # Recupera as taxas de câmbio usando o módulo bcb.currency
+            taxas = currency.get(moedas, start=data_inicio, end=data_fim)
 
-                # Plote o gráfico da taxa de variação diária
-                plt.plot(self.daily_returns.index, self.daily_returns)
-                plt.title(f'Taxa de variação diária de {self.moeda_var.get()} em {self.dat_var.get()}')
-                plt.xlabel('Data')
-                plt.ylabel('Taxa de variação diária')
+            # Plota as taxas de câmbio em um gráfico usando o matplotlib
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.plot(taxas.index, taxas['CAD'], label='CAD')
+            ax.legend()
+            ax.set_xlabel('Data')
+            ax.set_ylabel('Taxa de câmbio')
+            ax.set_title('Taxas de câmbio CAD')
+            plt.show()
+
+        else:
+            root = tk.Tk()
+            root.title('Gráfico de Taxas de Câmbio')
+            root.geometry('300x200')
+
+            # Adiciona o seletor de data
+            cal = DateEntry(root, width=12, background='darkblue', foreground='white', borderwidth=2)
+            cal.pack(padx=10, pady=10)
+
+            # Adiciona o botão para gerar o gráfico
+            gerar_botao = ttk.Button(root, text="Gerar Gráfico", command=gerar_grafico)
+            gerar_botao.pack(padx=10, pady=10)
+
+            root.mainloop()
             
-                # Remove o eixo x
-                plt.gca().axes.xaxis.set_visible(False)
-            
-                plt.show()
-
+    def convo(self):
+        self.conversao = requests.get("http://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL,JPY-BRL,USD-BRLT")
+        #Pega as moedas disponíveis no site (Atualizado a cada 30 segundos) e armazena
+        
+        self.requisicao = self.conversao.json()
+        
+        self.cotacao_dolar = self.requisicao["USDBRL"]["bid"]
+        self.cotacao_euro = self.requisicao["EURBRL"]["bid"]
+        self.cotacao_libra = self.requisicao["GBPBRL"]["bid"]
+        self.cotacao_dolcad = self.requisicao["CADBRL"]["bid"]
 
 master = Tk()
-janela = conversor_moeda()
-janela.ttk(master)
+janela = conversor_moeda(master)
 master.mainloop()
